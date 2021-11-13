@@ -1,0 +1,35 @@
+#! perl
+
+=head1 NAME
+
+respawn - start a new terminal on destroy
+
+=head1 SYNOPSIS
+
+    urxvt -pe respawn
+
+=head1 DESCRIPTION
+
+When the current terminal finished, a new one will start with the same arguments.
+
+=cut
+
+
+sub on_destroy {
+    my ($self) = @_;
+
+    if (! $self->{_delete_window}) {
+        my @argv = $self->argv;
+        shift @argv;
+
+        new urxvt::term($self->env, $urxvt::RXVTNAME, @argv);
+    }
+}
+
+sub on_wm_delete_window {
+    my ($self) = @_;
+
+    $self->{_delete_window} = 1;
+
+    return  0;
+}
